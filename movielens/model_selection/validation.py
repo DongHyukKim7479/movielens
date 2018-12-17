@@ -40,10 +40,25 @@ def get_dataset(df, k_fold, offset):
     return df_train, df_test
 
 
+def _get_duplicate_2d_array(np_2d_1, np_2d_2):
+    nrows, ncols = np_2d_1.shape
+    dtype = {'names': ['f{}'.format(i) for i in range(ncols)],
+             'formats': ncols * [np_2d_1.dtype]}
+
+    np_duplicate_2d = np.intersect1d(np_2d_1.view(dtype), np_2d_2.view(dtype))
+    np_duplicate_2d = np_duplicate_2d.view(np_2d_1.dtype).reshape(-1, 2)
+
+    return np_duplicate_2d
+
+
 def get_rmse(mat_actual, mat_pred):
-    tu_new = mat_actual.nonzero()[0], mat_actual.nonzero()[1]
-    pred = mat_pred[tu_new]
-    actu = mat_actual[tu_new]
+    np_exist_index_test = np.c_[mat_actual.nonzero()[0], mat_actual.nonzero()[1]]
+    np_exist_index_pred = np.c_[mat_pred.nonzero()[0], mat_pred.nonzero()[1]]
+
+    np_duplicate_2d = _get_duplicate_2d_array(np_exist_index_test, np_exist_index_pred)
+    tupl_exist_index = np_duplicate_2d[:, 0], np_duplicate_2d[:, 1]
+    actu = mat_actual[tupl_exist_index]
+    pred = mat_pred[tupl_exist_index]
 
     return sqrt(mean_squared_error(actu, pred))
 
