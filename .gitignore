@@ -1,0 +1,5 @@
+jupyter-notebooks/.ipynb_checkpoints
+movielens/movielens/venv
+movielens/movielens/.idea
+movielens/movielens/__pycache__
+
